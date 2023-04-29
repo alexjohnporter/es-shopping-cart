@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Infra;
 
+use App\Domain\ShoppingCart\Exceptions\ShoppingCartNotFound;
 use App\Domain\ShoppingCart\ShoppingCart;
 use App\Domain\ShoppingCart\ShoppingCartId;
 use App\Domain\ShoppingCart\ShoppingCartRepository;
@@ -19,7 +20,10 @@ class ShoppingCartRepositoryEventSauce implements ShoppingCartRepository
     public function get(string $cartId): ShoppingCart
     {
         $cart = $this->repository->retrieve(ShoppingCartId::fromString($cartId));
-        assert($cart instanceof ShoppingCart);// todo use annonymous class
+
+        if (!$cart instanceof ShoppingCart) {
+            throw new ShoppingCartNotFound();
+        }
 
         return $cart;
     }

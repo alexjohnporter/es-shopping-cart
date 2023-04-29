@@ -12,9 +12,18 @@ class ShoppingCartHandler
     public function __construct(private ShoppingCartRepository $cartRepository) {}
 
     #[AsMessageHandler]
-    public function handleShoppingCartInitialised(ShoppingCartInitalised $cartInitalised)
+    public function handleShoppingCartInitialised(ShoppingCartInitalised $cartInitalised): void
     {
-        $shoppingCart = ShoppingCart::initiate($cartInitalised->getId());
-        $this->cartRepository->save($shoppingCart);
+        $cart = ShoppingCart::initiate($cartInitalised->getId());
+        $this->cartRepository->save($cart);
+    }
+
+    #[AsMessageHandler]
+    public function handleAddItemToCart(AddItemToCart $addItemToCart): void
+    {
+        $cart = $this->cartRepository->get($addItemToCart->getCartId());
+        $cart->addItem($addItemToCart->getLineItem());
+
+        $this->cartRepository->save($cart);
     }
 }

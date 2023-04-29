@@ -3,8 +3,9 @@ declare(strict_types=1);
 
 namespace App\UserInterface\Controller;
 
+use App\Application\AddItemToCart;
 use App\Application\ShoppingCartInitalised;
-use App\Domain\ShoppingCart\ShoppingCartId;
+use App\Domain\ShoppingCart\LineItem;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,7 +18,7 @@ class IndexController extends AbstractController
     {
     }
 
-    #[Route('/', name: 'index')]
+    #[Route('/start', name: 'index')]
     public function index(): JsonResponse
     {
         $this->bus->dispatch(new ShoppingCartInitalised((string)Uuid::uuid4()));
@@ -25,5 +26,60 @@ class IndexController extends AbstractController
         return new JsonResponse([
             'status' => 'ok'
         ]);
+    }
+
+    #[Route('/add-item/{cartId}', name: 'add-item')]
+    public function addItemToCart(string $cartId)
+    {
+        $lineItemPayload = $this->getRandomFakeLineItem();
+        $this->bus->dispatch(new AddItemToCart($cartId, LineItem::fromPayload($lineItemPayload)));
+
+        return new JsonResponse([
+            'status' => 'Item Added'
+        ]);
+    }
+
+    private function getRandomFakeLineItem(): array
+    {
+        $items = $this->fakeLineItems();
+        $count = count($items);
+
+        return $items[rand(0, $count-1)];
+    }
+
+    private function fakeLineItems(): array
+    {
+        return [
+            [
+                'itemName' => 'Ceramic Mug',
+                'price' => 250,
+                'quantity' => 1
+            ],
+            [
+                'itemName' => 'Ceramic Mug',
+                'price' => 250,
+                'quantity' => 2
+            ],
+            [
+                'itemName' => 'Blue Plate',
+                'price' => 300,
+                'quantity' => 1
+            ],
+            [
+                'itemName' => 'Silverware',
+                'price' => 1000,
+                'quantity' => 1
+            ],
+            [
+                'itemName' => 'Pasta Bowl',
+                'price' => 500,
+                'quantity' => 1
+            ],
+            [
+                'itemName' => 'Pasta Bowl',
+                'price' => 500,
+                'quantity' => 4
+            ],
+        ];
     }
 }
