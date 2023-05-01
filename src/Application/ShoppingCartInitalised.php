@@ -10,4 +10,9 @@ class ShoppingCartInitalised
     {
         return $this->id;
     }
+
+    public function getStatus(): string
+    {
+        return 'open';
+    }
 }

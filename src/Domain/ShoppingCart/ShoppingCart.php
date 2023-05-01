@@ -5,7 +5,6 @@ namespace App\Domain\ShoppingCart;
 
 use App\Application\AddItemToCart;
 use App\Domain\ShoppingCart\Events\ItemAddedToCart;
-use App\Domain\ShoppingCart\Events\ItemQuantityUpdated;
 use App\Domain\ShoppingCart\Events\ShoppingCartWasInitialised;
 use EventSauce\EventSourcing\AggregateRoot;
 use EventSauce\EventSourcing\AggregateRootBehaviour;
@@ -27,27 +26,13 @@ class ShoppingCart implements AggregateRoot
         $aggregateRootId = ShoppingCartId::fromString($shoppingCartId);
 
         $cart = new static($aggregateRootId);
-        $cart->recordThat(new ShoppingCartWasInitialised($aggregateRootId));
+        $cart->recordThat(new ShoppingCartWasInitialised($aggregateRootId, 'open'));
 
         return $cart;
     }
 
     public function addItem(LineItem $lineItem): ShoppingCart
     {
-        $existingLineItem = $this->getItemFromCart($lineItem->getItemName());
-
-        if ($existingLineItem) {
-            $this->recordThat(
-                new ItemQuantityUpdated(
-                    $this->aggregateRootId->toString(),
-                    $lineItem->getItemName(),
-                    $lineItem->getQuantity() + $existingLineItem->getQuantity()
-                )
-            );
-
-            return $this;
-        }
-
         $this->recordThat(
             new ItemAddedToCart($this->aggregateRootId->toString(), $lineItem)
         );
@@ -65,18 +50,6 @@ class ShoppingCart implements AggregateRoot
         $this->lineItems[] = $itemAddedToCart->getLineItem();
     }
 
-    protected function applyItemQuantityUpdated(ItemQuantityUpdated $itemQuantityUpdated): void
-    {
-        /**
-         * @var LineItem $lineItem
-         */
-        foreach ($this->lineItems as $key => $lineItem) {
-            if ($lineItem->getItemName() == $itemQuantityUpdated->getItemName()) {
-                $lineItem->updateQuantity($itemQuantityUpdated->getQuantity());
-                $this->lineItems[$key] = $lineItem;
-            }
-        }
-    }
 
     private function getItemFromCart(string $itemName): ?LineItem
     {

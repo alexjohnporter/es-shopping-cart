@@ -4,9 +4,11 @@ namespace App\Infra\ServiceFactory;
 
 use App\Domain\ShoppingCart\ShoppingCart;
 use App\Domain\ShoppingCart\ShoppingCartRepository;
+use App\Infra\Read\CartProjector;
 use Doctrine\DBAL\DriverManager;
 use EventSauce\EventSourcing\EventSourcedAggregateRootRepository;
 use EventSauce\EventSourcing\Serialization\ConstructingMessageSerializer;
+use EventSauce\EventSourcing\SynchronousMessageDispatcher;
 use EventSauce\MessageRepository\DoctrineMessageRepository\DoctrineUuidV4MessageRepository;
 
 class ShoppingCartRepositoryFactory
@@ -24,6 +26,9 @@ class ShoppingCartRepositoryFactory
                     $connection,
                     'event_store',
                     new ConstructingMessageSerializer(),
+                ),
+                new SynchronousMessageDispatcher(
+                    new CartProjector()
                 )
             )
         );

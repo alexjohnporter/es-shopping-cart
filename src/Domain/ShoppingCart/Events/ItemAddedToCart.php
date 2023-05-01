@@ -20,6 +20,11 @@ class ItemAddedToCart implements SerializablePayload
         return $this->lineItem;
     }
 
+    public function getShoppingCartId(): string
+    {
+        return $this->shoppingCartId;
+    }
+
     public function toPayload(): array
     {
         return [
