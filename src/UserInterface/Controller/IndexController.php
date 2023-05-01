@@ -80,6 +80,11 @@ class IndexController extends AbstractController
                 'price' => 500,
                 'quantity' => 4
             ],
+            [
+                'itemName' => 'Candle Stick',
+                'price' => 100,
+                'quantity' => 1
+            ]
         ];
     }
 }

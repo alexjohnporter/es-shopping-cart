@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Infra;
+namespace App\Infra\ServiceFactory;
 
 use App\Domain\ShoppingCart\Exceptions\ShoppingCartNotFound;
 use App\Domain\ShoppingCart\ShoppingCart;
